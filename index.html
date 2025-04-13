@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz sobre CME</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .quiz-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .answer {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #222c23;
+        }
+        .incorrect {
+            background-color: #f01124; /* Vermelho para resposta errada */
+        }
+        .correct {
+            background-color: #17e647; /* Verde para resposta correta */
+        }
+        .feedback {
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .next-btn {
+            background-color: #007bff;
+            margin-top: 20px;
+        }
+        .next-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz">
+        <div class="question" id="question-text"></div>
+        <div class="answer">
+            <button onclick="checkAnswer('A')">Resposta A</button>
+        </div>
+        <div class="answer">
+            <button onclick="checkAnswer('B')">Resposta B</button>
+        </div>
+        <div class="answer">
+            <button onclick="checkAnswer('C')">Resposta C</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">Próxima Questão</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { question: "Qual o principal objetivo da CME?", answers: ["Garantir a qualidade de vida", "Desinfetar apenas", "Assegurar esterilização"], correct: 'C' },
+        { question: "O que é esterilização?", answers: ["Limpeza", "Eliminação de micro-organismos", "Ajuste de tamanho"], correct: 'B' },
+        { question: "Diferença entre desinfecção e esterilização?", answers: ["Desinfecção é mais forte", "Desinfecção elimina mais", "Esterilização elimina todos"], correct: 'C' },
+        { question: "Procedimento adequado para limpeza de instrumentos?", answers: ["Só água", "Lavar e esterilizar", "Lavar e guardar"], correct: 'B' },
+        { question: "Como armazenar materiais esterilizados?", answers: ["Secos e limpos", "Locais úmidos", "Qualquer lugar"], correct: 'A' },
+        { question: "O que é ciclo de esterilização?", answers: ["Desinfecção contínua", "Fases de exposição", "Momento de armazenamento"], correct: 'B' },
+        { question: "Materiais que devem ser esterilizados?", answers: ["Só cirúrgicos", "Contato com feridas", "Cirurgias complexas"], correct: 'B' },
+        { question: "Autoclave é indicada para?", answers: ["Sensíveis ao calor", "Que derretem", "Instrumentos cirúrgicos"], correct: 'C' },
+        { question: "Temperatura mínima em autoclave?", answers: ["150°C", "121°C", "180°C"], correct: 'B' },
+        { question: "Validade depende de?", answers: ["Tempo", "Material e armazenamento", "Cor do pacote"], correct: 'B' },
+        { question: "Exame visual serve para?", answers: ["Embelezar", "Verificar limpeza", "Classificar material"], correct: 'B' },
+        { question: "Quem atua na CME?", answers: ["Somente médicos", "Equipe de limpeza", "Profissionais treinados"], correct: 'C' },
+        { question: "Como garantir a esterilização?", answers: ["Papel alumínio", "Indicadores químicos", "Sol ao sol"], correct: 'B' },
+        { question: "Indicador biológico avalia?", answers: ["Cor do pacote", "Presença de vida microbiana", "Validade do produto"], correct: 'B' },
+        { question: "Após uso, material cirúrgico deve ser?", answers: ["Descartado", "Enviado para CME", "Guardado"], correct: 'B' },
+        { question: "Instrumentos enferrujados devem ser?", answers: ["Utilizados", "Lubrificados", "Substituídos"], correct: 'C' },
+        { question: "Limpeza manual é indicada quando?", answers: ["Sempre", "Quando não há lavadora", "Nunca"], correct: 'B' },
+        { question: "Lavadora ultrassônica usa?", answers: ["Vibração", "Calor seco", "Luz"], correct: 'A' },
+        { question: "Quando reprocessar um item?", answers: ["Sempre que reutilizado", "Ao final do ano", "Quando parecer limpo"], correct: 'A' },
+        { question: "CME deve ser localizada?", answers: ["Fora do hospital", "Próxima ao centro cirúrgico", "Na recepção"], correct: 'B' },
+        { question: "EPI obrigatório na CME?", answers: ["Touca", "Sandália", "Sem EPI"], correct: 'A' },
+        { question: "Acondicionamento adequado?", answers: ["Em balde", "Em caixa esterilizada", "Em caixa comum"], correct: 'B' },
+        { question: "Setores da CME incluem?", answers: ["Recepção e limpeza", "Administração", "Farmácia"], correct: 'A' },
+        { question: "Função da barreira física?", answers: ["Separar áreas limpas e sujas", "Decoração", "Armazenamento"], correct: 'A' },
+        { question: "Ar comprimido serve para?", answers: ["Secar", "Molhar", "Refrigerar"], correct: 'A' },
+        { question: "Envelope furado deve ser?", answers: ["Reutilizado", "Esterilizado novamente", "Descartado"], correct: 'C' },
+        { question: "Qualidade da água afeta?", answers: ["Nada", "Limpeza e esterilização", "Armazenamento"], correct: 'B' },
+        { question: "Quem valida o processo de esterilização?", answers: ["Qualquer um", "Técnico habilitado", "Paciente"], correct: 'B' },
+        { question: "CME é responsável por?", answers: ["Ambiente", "EPI", "Reprocessamento de materiais"], correct: 'C' },
+        { question: "Falha na esterilização causa?", answers: ["Infecção", "Nada", "Economia"], correct: 'A' },
+        { question: "Registro de controle deve ser?", answers: ["Verbal", "Escrito", "Ignorado"], correct: 'B' },
+        { question: "Material esterilizado molhado?", answers: ["Usar rápido", "Descartar", "Secar com pano"], correct: 'B' },
+        { question: "Tempo de esterilização varia com?", answers: ["Tamanho da autoclave", "Tipo de material", "Peso do operador"], correct: 'B' },
+        { question: "Estocagem deve evitar?", answers: ["Luz", "Poeira e umidade", "Sombra"], correct: 'B' },
+        { question: "Monitoramento inclui?", answers: ["Somente visual", "Indicadores físicos, químicos e biológicos", "Cheiro"], correct: 'B' },
+        { question: "Rastreabilidade garante?", answers: ["Custo menor", "Responsabilidade do processo", "Publicidade"], correct: 'B' },
+        { question: "Todo material reutilizável precisa de?", answers: ["Armazenamento", "Reprocessamento completo", "Etiqueta"], correct: 'B' },
+        { question: "Treinamento da equipe é?", answers: ["Opcional", "Obrigatório", "Raro"], correct: 'B' },
+        { question: "Controle de qualidade previne?", answers: ["Perda de material", "Erros no processo", "Custo"], correct: 'B' },
+        { question: "Esterilização química é usada para?", answers: ["Metais", "Sensíveis ao calor", "Tecidos"], correct: 'B' },
+        { question: "Esterilização por óxido de etileno é?", answers: ["Comum", "Para emergências", "Para materiais especiais"], correct: 'C' },
+        { question: "Falhas comuns na CME incluem?", answers: ["Falta de material", "Falta de pessoal e erro no processo", "Excesso de EPIs"], correct: 'B' },
+        { question: "Indicadores químicos mudam?", answers: ["Som", "Cor", "Tamanho"], correct: 'B' },
+        { question: "CME é setor essencial para?", answers: ["Administração", "Limpeza geral", "Segurança hospitalar"], correct: 'C' }
+    ];
+
+    let currentQuestionIndex = 0;
+
+    function loadQuestion() {
+        const question = questions[currentQuestionIndex];
+        document.getElementById("question-text").innerText = question.question;
+        const buttons = document.querySelectorAll('.answer button');
+        buttons[0].innerText = question.answers[0];
+        buttons[1].innerText = question.answers[1];
+        buttons[2].innerText = question.answers[2];
+        buttons.forEach(button => button.classList.remove('correct', 'incorrect'));  // Remove classes for new question
+        document.getElementById("feedback").innerText = '';
+        document.getElementById("next-btn").style.display = 'none';
+    }
+
+    function checkAnswer(selected) {
+        const correctAnswer = questions[currentQuestionIndex].correct;
+        const buttons = document.querySelectorAll('.answer button');
+        
+        buttons.forEach(button => {
+            if (button.innerText === questions[currentQuestionIndex].answers[questions[currentQuestionIndex].correct.charCodeAt(0) - 65]) {
+                button.classList.add('correct');  // Add class to correct answer
+            } else {
+                button.classList.add('incorrect');  // Add class to incorrect answers
+            }
+        });
+
+        const feedbackText = selected === correctAnswer ? "Parabéns! Prestou atenção na aula! ganhou um ♥ de Liliana" : "Liliana vai tirar um décimo. A alternativa correta é: " + questions[currentQuestionIndex].answers[correctAnswer.charCodeAt(0) - 65];
+        document.getElementById("feedback").innerText = feedbackText;
+
+        document.getElementById("next-btn").style.display = 'block';
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            loadQuestion();
+        } else {
+            document.getElementById("quiz").innerHTML = "<h2>Quiz concluído! Parabéns por completar todas as questões!</h2>";
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
